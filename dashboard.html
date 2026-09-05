@@ -10,13 +10,17 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>رصدگر بازار</title>
+    <title>
+        رصدگر بازار
+    </title>
+
 
     <style>
 
         * {
             box-sizing: border-box;
         }
+
 
         body {
 
@@ -33,59 +37,121 @@
             color:
                 #ffffff;
 
-            padding:
-                20px;
+            min-height:
+                100vh;
         }
+
 
         .container {
 
-            max-width:
-                1200px;
+            width:
+                min(1400px, 94%);
 
             margin:
                 auto;
+
+            padding:
+                25px 0 50px;
         }
+
+
+        header {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #151d38,
+                    #11182d
+                );
+
+            border:
+                1px solid #273354;
+
+            border-radius:
+                20px;
+
+            padding:
+                25px;
+
+            margin-bottom:
+                20px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(0,0,0,.25);
+        }
+
 
         h1 {
 
-            margin-bottom:
-                5px;
+            margin:
+                0 0 10px;
+
+            font-size:
+                30px;
         }
+
 
         .subtitle {
 
             color:
-                #aab3c5;
+                #aeb8d0;
 
-            margin-bottom:
-                25px;
+            font-size:
+                14px;
         }
+
+
+        .status-row {
+
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                12px;
+
+            margin-top:
+                20px;
+        }
+
 
         .status {
 
             padding:
-                15px;
+                10px 16px;
 
             border-radius:
                 12px;
 
             background:
-                #151d33;
+                #11182c;
 
-            margin-bottom:
-                20px;
+            border:
+                1px solid #293655;
+
+            font-size:
+                14px;
         }
+
 
         .online {
 
             color:
-                #42e695;
-
-            font-weight:
-                bold;
+                #45e39a;
         }
 
-        .cards {
+
+        .offline {
+
+            color:
+                #ff6262;
+        }
+
+
+        .grid {
 
             display:
                 grid;
@@ -93,45 +159,49 @@
             grid-template-columns:
                 repeat(
                     auto-fit,
-                    minmax(
-                        180px,
-                        1fr
-                    )
+                    minmax(220px, 1fr)
                 );
 
             gap:
                 15px;
 
             margin-bottom:
-                25px;
+                20px;
         }
+
 
         .card {
 
             background:
-                #151d33;
+                #11182c;
+
+            border:
+                1px solid #273354;
+
+            border-radius:
+                18px;
 
             padding:
                 20px;
 
-            border-radius:
-                15px;
-
-            border:
-                1px solid #273354;
+            box-shadow:
+                0 8px 30px
+                rgba(0,0,0,.18);
         }
+
 
         .card-title {
 
             color:
-                #aab3c5;
+                #9ca9c7;
 
             font-size:
-                14px;
+                13px;
 
             margin-bottom:
-                8px;
+                10px;
         }
+
 
         .card-value {
 
@@ -142,184 +212,66 @@
                 bold;
         }
 
-        .alert {
 
-            background:
-                #151d33;
-
-            border:
-                1px solid #273354;
-
-            border-radius:
-                15px;
-
-            padding:
-                20px;
-
-            margin-bottom:
-                15px;
-        }
-
-        .alert-header {
+        .toolbar {
 
             display:
                 flex;
 
-            justify-content:
-                space-between;
-
-            gap:
-                10px;
-
             flex-wrap:
                 wrap;
 
-            margin-bottom:
-                15px;
-        }
-
-        .symbol {
-
-            font-size:
-                24px;
-
-            font-weight:
-                bold;
-        }
-
-        .badge {
-
-            padding:
-                6px 12px;
-
-            border-radius:
-                20px;
-
-            background:
-                #263453;
-        }
-
-        .buy {
-
-            color:
-                #42e695;
-        }
-
-        .sell {
-
-            color:
-                #ff6b6b;
-        }
-
-        .whale {
-
-            margin-top:
-                15px;
-
-            padding:
-                15px;
-
-            border-radius:
-                12px;
-
-            background:
-                #10182b;
-        }
-
-        .grid {
-
-            display:
-                grid;
-
-            grid-template-columns:
-                repeat(
-                    auto-fit,
-                    minmax(
-                        150px,
-                        1fr
-                    )
-                );
-
             gap:
                 10px;
 
-            margin-top:
-                15px;
-        }
-
-        .item {
-
-            background:
-                #10182b;
-
-            padding:
-                12px;
-
-            border-radius:
-                10px;
-        }
-
-        .label {
-
-            color:
-                #8f9bb3;
-
-            font-size:
-                12px;
-
             margin-bottom:
-                5px;
+                20px;
         }
 
-        .value {
-
-            font-weight:
-                bold;
-        }
-
-        .empty {
-
-            text-align:
-                center;
-
-            padding:
-                50px;
-
-            color:
-                #8f9bb3;
-        }
 
         button {
 
             border:
                 none;
 
-            border-radius:
-                10px;
-
-            padding:
-                10px 18px;
-
-            cursor:
-                pointer;
-
             background:
-                #263b70;
+                #273b73;
 
             color:
                 white;
+
+            padding:
+                11px 18px;
+
+            border-radius:
+                10px;
+
+            cursor:
+                pointer;
 
             font-size:
                 14px;
         }
 
+
         button:hover {
 
-            background:
-                #34519a;
+            opacity:
+                .85;
         }
 
-        .topbar {
+
+        button:disabled {
+
+            opacity:
+                .5;
+
+            cursor:
+                not-allowed;
+        }
+
+
+        .alerts-title {
 
             display:
                 flex;
@@ -333,11 +285,402 @@
             gap:
                 15px;
 
+            margin-bottom:
+                15px;
+        }
+
+
+        .alerts-title h2 {
+
+            margin:
+                0;
+
+            font-size:
+                22px;
+        }
+
+
+        .alert {
+
+            background:
+                #0d1427;
+
+            border:
+                1px solid #293655;
+
+            border-radius:
+                16px;
+
+            padding:
+                18px;
+
+            margin-bottom:
+                15px;
+        }
+
+
+        .alert-head {
+
+            display:
+                flex;
+
             flex-wrap:
                 wrap;
 
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            gap:
+                10px;
+
+            margin-bottom:
+                15px;
+        }
+
+
+        .symbol {
+
+            font-size:
+                21px;
+
+            font-weight:
+                bold;
+        }
+
+
+        .badge {
+
+            display:
+                inline-block;
+
+            padding:
+                6px 10px;
+
+            border-radius:
+                8px;
+
+            font-size:
+                12px;
+
+            margin-left:
+                5px;
+
+            margin-bottom:
+                5px;
+        }
+
+
+        .buy {
+
+            background:
+                #123f32;
+
+            color:
+                #4ff0a5;
+        }
+
+
+        .sell {
+
+            background:
+                #4b1c29;
+
+            color:
+                #ff7187;
+        }
+
+
+        .neutral {
+
+            background:
+                #303542;
+
+            color:
+                #c7cbd5;
+        }
+
+
+        .high {
+
+            background:
+                #46361a;
+
+            color:
+                #ffd76a;
+        }
+
+
+        .very-high {
+
+            background:
+                #4b2020;
+
+            color:
+                #ff8585;
+        }
+
+
+        .medium {
+
+            background:
+                #203a54;
+
+            color:
+                #7ecbff;
+        }
+
+
+        .details {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(150px, 1fr)
+                );
+
+            gap:
+                10px;
+        }
+
+
+        .detail {
+
+            background:
+                #121b31;
+
+            border-radius:
+                10px;
+
+            padding:
+                12px;
+        }
+
+
+        .detail-label {
+
+            color:
+                #8491af;
+
+            font-size:
+                11px;
+
+            margin-bottom:
+                5px;
+        }
+
+
+        .detail-value {
+
+            font-size:
+                15px;
+
+            font-weight:
+                bold;
+        }
+
+
+        .whale {
+
+            margin-top:
+                15px;
+
+            padding:
+                15px;
+
+            border-radius:
+                12px;
+
+            background:
+                #151c32;
+
+            border:
+                1px solid #303d62;
+        }
+
+
+        .whale-title {
+
+            font-weight:
+                bold;
+
+            margin-bottom:
+                10px;
+        }
+
+
+        .reasons {
+
+            margin-top:
+                15px;
+
+            padding:
+                12px;
+
+            background:
+                #10172a;
+
+            border-radius:
+                10px;
+
+            color:
+                #b9c3d9;
+
+            line-height:
+                1.9;
+
+            font-size:
+                13px;
+        }
+
+
+        .empty {
+
+            text-align:
+                center;
+
+            padding:
+                50px 20px;
+
+            color:
+                #8792ac;
+        }
+
+
+        .loading {
+
+            text-align:
+                center;
+
+            padding:
+                35px;
+
+            color:
+                #aeb8d0;
+        }
+
+
+        .error {
+
+            background:
+                #3a1820;
+
+            border:
+                1px solid #71303d;
+
+            color:
+                #ff899a;
+
+            border-radius:
+                12px;
+
+            padding:
+                15px;
+
             margin-bottom:
                 20px;
+
+            line-height:
+                1.8;
+        }
+
+
+        .success-box {
+
+            background:
+                #12382d;
+
+            border:
+                1px solid #24634f;
+
+            color:
+                #70edb5;
+
+            border-radius:
+                12px;
+
+            padding:
+                12px 15px;
+
+            margin-bottom:
+                15px;
+
+            display:
+                none;
+        }
+
+
+        .warning {
+
+            background:
+                #332b16;
+
+            border:
+                1px solid #67572b;
+
+            color:
+                #e7d28a;
+
+            border-radius:
+                14px;
+
+            padding:
+                15px;
+
+            margin-top:
+                20px;
+
+            line-height:
+                1.8;
+
+            font-size:
+                13px;
+        }
+
+
+        footer {
+
+            text-align:
+                center;
+
+            color:
+                #6f7b95;
+
+            margin-top:
+                30px;
+
+            font-size:
+                12px;
+        }
+
+
+        @media (
+            max-width: 600px
+        ) {
+
+            h1 {
+
+                font-size:
+                    23px;
+            }
+
+            .card-value {
+
+                font-size:
+                    21px;
+            }
+
+            .alert-head {
+
+                align-items:
+                    flex-start;
+            }
+
         }
 
     </style>
@@ -347,40 +690,84 @@
 
 <body>
 
+
 <div class="container">
 
-    <div class="topbar">
 
-        <div>
+    <!-- HEADER -->
 
-            <h1>
-                📡 رصدگر بازار
-            </h1>
+    <header>
 
-            <div class="subtitle">
-                پنل آنلاین تحلیل و هشدار بازار
+        <h1>
+            📡 رصدگر بازار
+        </h1>
+
+        <div class="subtitle">
+
+            سیستم پایش خودکار بازار ارزهای دیجیتال
+
+        </div>
+
+
+        <div class="status-row">
+
+            <div
+                class="status"
+                id="serverStatus"
+            >
+                🔄 در حال اتصال...
+            </div>
+
+
+            <div
+                class="status"
+                id="coinCount"
+            >
+                🪙 ارزها: -
+            </div>
+
+
+            <div
+                class="status"
+                id="interval"
+            >
+                ⏱ بررسی: -
+            </div>
+
+
+            <div
+                class="status"
+                id="lastCheck"
+            >
+                🕐 آخرین بررسی: -
             </div>
 
         </div>
 
-        <button
-            onclick="loadData()"
-        >
-            🔄 بروزرسانی
-        </button>
+    </header>
 
-    </div>
 
+    <!-- ERROR -->
 
     <div
-        class="status"
-        id="status"
-    >
-        در حال اتصال...
-    </div>
+        class="error"
+        id="errorBox"
+        style="display:none;"
+    ></div>
 
 
-    <div class="cards">
+    <!-- SUCCESS -->
+
+    <div
+        class="success-box"
+        id="successBox"
+    ></div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="grid">
+
 
         <div class="card">
 
@@ -390,7 +777,7 @@
 
             <div
                 class="card-value"
-                id="serverStatus"
+                id="statusValue"
             >
                 -
             </div>
@@ -401,28 +788,12 @@
         <div class="card">
 
             <div class="card-title">
-                ارزهای تحت بررسی
+                تعداد ارزهای تحت نظر
             </div>
 
             <div
                 class="card-value"
-                id="coinCount"
-            >
-                -
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-title">
-                فاصله بررسی
-            </div>
-
-            <div
-                class="card-value"
-                id="interval"
+                id="coinsValue"
             >
                 -
             </div>
@@ -438,158 +809,680 @@
 
             <div
                 class="card-value"
-                id="alertCount"
+                id="alertsValue"
             >
                 -
             </div>
 
         </div>
 
+
+        <div class="card">
+
+            <div class="card-title">
+                وضعیت پیامک
+            </div>
+
+            <div
+                class="card-value"
+                id="smsValue"
+            >
+                خاموش
+            </div>
+
+        </div>
+
+
     </div>
 
 
-    <h2>
-        🚨 آخرین هشدارها
-    </h2>
+    <!-- BUTTONS -->
+
+    <div class="toolbar">
+
+        <button
+            id="refreshButton"
+            onclick="loadDashboard()"
+        >
+            🔄 بروزرسانی
+        </button>
 
 
-    <div id="alerts">
+        <button
+            id="checkButton"
+            onclick="manualCheck()"
+        >
+            🔎 بررسی بازار الان
+        </button>
 
-        <div class="empty">
-            در حال دریافت اطلاعات...
+
+        <button
+            onclick="loadLatest()"
+        >
+            🚨 آخرین هشدار
+        </button>
+
+    </div>
+
+
+    <!-- ALERTS -->
+
+    <div class="card">
+
+        <div class="alerts-title">
+
+            <h2>
+                🚨 هشدارهای بازار
+            </h2>
+
+            <span
+                id="alertCountText"
+                class="subtitle"
+            >
+                0 هشدار
+            </span>
+
+        </div>
+
+
+        <div
+            id="alertsContainer"
+        >
+
+            <div class="loading">
+                در حال دریافت اطلاعات...
+            </div>
+
         </div>
 
     </div>
 
+
+    <!-- WARNING -->
+
+    <div class="warning">
+
+        ⚠️
+        هشدارهای این سیستم بر اساس تحلیل تکنیکال
+        و تشخیص فعالیت غیرعادی حجم بازار تولید می‌شوند.
+        بخش «فعالیت نهنگ» یک شاخص تقریبی از فعالیت غیرعادی
+        بازار است و به معنی شناسایی قطعی یک کیف پول نهنگ نیست.
+        هیچ سیگنالی تضمین‌کننده سود نیست.
+
+    </div>
+
+
+    <footer>
+
+        Rasadgar Bazaar • Market Monitoring System
+
+    </footer>
+
+
 </div>
+
 
 
 <script>
 
-async function api(
-    path
+/* ==================================================
+   API BASE
+================================================== */
+
+/*
+   مهم:
+   چون dashboard از همان Render Server سرو می‌شود،
+   نیازی به نوشتن آدرس Render نداریم.
+
+   مرورگر خودش همان آدرس سایت را استفاده می‌کند.
+*/
+
+const API_BASE =
+    window.location.origin;
+
+
+/* ==================================================
+   ELEMENTS
+================================================== */
+
+const serverStatus =
+    document.getElementById(
+        "serverStatus"
+    );
+
+const coinCount =
+    document.getElementById(
+        "coinCount"
+    );
+
+const intervalElement =
+    document.getElementById(
+        "interval"
+    );
+
+const lastCheck =
+    document.getElementById(
+        "lastCheck"
+    );
+
+const statusValue =
+    document.getElementById(
+        "statusValue"
+    );
+
+const coinsValue =
+    document.getElementById(
+        "coinsValue"
+    );
+
+const alertsValue =
+    document.getElementById(
+        "alertsValue"
+    );
+
+const smsValue =
+    document.getElementById(
+        "smsValue"
+    );
+
+const alertsContainer =
+    document.getElementById(
+        "alertsContainer"
+    );
+
+const alertCountText =
+    document.getElementById(
+        "alertCountText"
+    );
+
+const errorBox =
+    document.getElementById(
+        "errorBox"
+    );
+
+const successBox =
+    document.getElementById(
+        "successBox"
+    );
+
+const refreshButton =
+    document.getElementById(
+        "refreshButton"
+    );
+
+const checkButton =
+    document.getElementById(
+        "checkButton"
+    );
+
+
+/* ==================================================
+   HELPERS
+================================================== */
+
+function showError(
+    message
 ) {
 
+    errorBox.style.display =
+        "block";
+
+    errorBox.textContent =
+        "❌ " + message;
+}
+
+
+function hideError() {
+
+    errorBox.style.display =
+        "none";
+
+    errorBox.textContent =
+        "";
+}
+
+
+function showSuccess(
+    message
+) {
+
+    successBox.style.display =
+        "block";
+
+    successBox.textContent =
+        "✅ " + message;
+
+
+    setTimeout(
+        () => {
+
+            successBox.style.display =
+                "none";
+
+        },
+        4000
+    );
+}
+
+
+function escapeHTML(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+function formatNumber(
+    value,
+    digits = 2
+) {
+
+    const number =
+        Number(value);
+
+
+    if (
+        !Number.isFinite(number)
+    ) {
+
+        return "-";
+    }
+
+
+    return number.toLocaleString(
+        "en-US",
+        {
+            maximumFractionDigits:
+                digits
+        }
+    );
+}
+
+
+function formatPercent(
+    value
+) {
+
+    const number =
+        Number(value);
+
+
+    if (
+        !Number.isFinite(number)
+    ) {
+
+        return "-";
+    }
+
+
+    return (
+        number >= 0
+            ? "+"
+            : ""
+    )
+    +
+    number.toFixed(2)
+    +
+    "%";
+}
+
+
+/* ==================================================
+   FETCH JSON
+================================================== */
+
+async function fetchJSON(
+    endpoint,
+    options = {}
+) {
+
+    const url =
+        API_BASE +
+        endpoint;
+
+
     const response =
-        await fetch(path);
+        await fetch(
+            url,
+            {
+                ...options,
+
+                headers: {
+
+                    "Accept":
+                        "application/json",
+
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
+
 
     if (
         !response.ok
     ) {
 
         throw new Error(
-            "خطا در دریافت اطلاعات"
+            `خطای سرور: ${response.status}`
         );
     }
 
-    return response.json();
+
+    return await response.json();
 }
 
 
-/* =========================
-   نمایش هشدار
-========================= */
+/* ==================================================
+   LOAD STATUS
+================================================== */
 
-function renderAlert(
-    alert
+async function loadStatus() {
+
+    const data =
+        await fetchJSON(
+            "/api/status"
+        );
+
+
+    if (
+        !data ||
+        data.ok !== true
+    ) {
+
+        throw new Error(
+            "سرور آنلاین نیست."
+        );
+    }
+
+
+    serverStatus.textContent =
+        "🟢 سرور آنلاین";
+
+    serverStatus.className =
+        "status online";
+
+
+    statusValue.textContent =
+        "آنلاین";
+
+
+    coinCount.textContent =
+        "🪙 ارزها: " +
+        (
+            data.monitoredCoins ??
+            "-"
+        );
+
+
+    coinsValue.textContent =
+        data.monitoredCoins ??
+        "-";
+
+
+    intervalElement.textContent =
+        "⏱ بررسی: " +
+        (
+            data.intervalSeconds ??
+            "-"
+        ) +
+        " ثانیه";
+
+
+    lastCheck.textContent =
+        "🕐 آخرین بررسی: " +
+        new Date(
+            data.lastCheck
+        ).toLocaleTimeString(
+            "fa-IR"
+        );
+
+
+    smsValue.textContent =
+        data.sms === true
+            ? "فعال"
+            : "خاموش";
+
+}
+
+
+/* ==================================================
+   SIGNAL BADGE
+================================================== */
+
+function signalBadge(
+    signal
 ) {
 
-    const signal =
-        alert.signal || "-";
+    const value =
+        String(
+            signal || "-"
+        ).toUpperCase();
 
 
-    const signalClass =
-        signal === "BUY"
-            ? "buy"
-            : signal === "SELL"
-                ? "sell"
-                : "";
+    if (
+        value === "BUY"
+    ) {
+
+        return `
+            <span class="badge buy">
+                🟢 BUY
+            </span>
+        `;
+    }
 
 
-    const whale =
-        alert.whale || {};
+    if (
+        value === "SELL"
+    ) {
+
+        return `
+            <span class="badge sell">
+                🔴 SELL
+            </span>
+        `;
+    }
+
+
+    return `
+        <span class="badge neutral">
+            ⚪ ${escapeHTML(value)}
+        </span>
+    `;
+}
+
+
+/* ==================================================
+   PRIORITY BADGE
+================================================== */
+
+function priorityBadge(
+    priority
+) {
+
+    const value =
+        String(
+            priority || "-"
+        ).toUpperCase();
+
+
+    let className =
+        "medium";
+
+
+    if (
+        value === "HIGH"
+    ) {
+
+        className =
+            "high";
+
+    } else if (
+        value === "VERY_HIGH"
+    ) {
+
+        className =
+            "very-high";
+    }
+
+
+    return `
+        <span
+            class="badge ${className}"
+        >
+            اولویت:
+            ${escapeHTML(value)}
+        </span>
+    `;
+}
+
+
+/* ==================================================
+   WHALE RENDER
+================================================== */
+
+function renderWhale(
+    whale
+) {
+
+    if (
+        !whale ||
+        whale.available !== true
+    ) {
+
+        return `
+            <div class="whale">
+
+                <div class="whale-title">
+                    🐋 فعالیت غیرعادی
+                </div>
+
+                <div>
+                    اطلاعات فعالیت غیرعادی
+                    در این هشدار موجود نیست.
+                </div>
+
+            </div>
+        `;
+    }
+
+
+    let direction =
+        "⚪ خنثی";
+
+
+    if (
+        whale.signal ===
+        "BULLISH"
+    ) {
+
+        direction =
+            "🟢 صعودی";
+
+    } else if (
+        whale.signal ===
+        "BEARISH"
+    ) {
+
+        direction =
+            "🔴 نزولی";
+    }
 
 
     return `
 
-        <div class="alert">
+        <div class="whale">
 
-            <div class="alert-header">
-
-                <div class="symbol">
-
-                    ${alert.symbol}
-
-                    <span
-                        class="${signalClass}"
-                    >
-                        ${signal}
-                    </span>
-
-                </div>
-
-                <div class="badge">
-
-                    اولویت:
-                    ${alert.priority || "-"}
-
-                </div>
-
+            <div class="whale-title">
+                🐋 فعالیت غیرعادی بازار
             </div>
 
+            <div class="details">
 
-            <div class="grid">
+                <div class="detail">
 
-                <div class="item">
-
-                    <div class="label">
-                        قدرت
+                    <div class="detail-label">
+                        جهت
                     </div>
 
-                    <div class="value">
-                        ${alert.strength || "-"}
-                    </div>
-
-                </div>
-
-
-                <div class="item">
-
-                    <div class="label">
-                        اعتماد ترکیبی
-                    </div>
-
-                    <div class="value">
-                        ${alert.combinedConfidence || "-"}
+                    <div class="detail-value">
+                        ${direction}
                     </div>
 
                 </div>
 
 
-                <div class="item">
+                <div class="detail">
 
-                    <div class="label">
-                        قیمت
+                    <div class="detail-label">
+                        شدت
                     </div>
 
-                    <div class="value">
-                        $${alert.priceFormatted || "-"}
+                    <div class="detail-value">
+                        ${escapeHTML(
+                            whale.level || "-"
+                        )}
                     </div>
 
                 </div>
 
 
-                <div class="item">
+                <div class="detail">
 
-                    <div class="label">
-                        RSI
+                    <div class="detail-label">
+                        نسبت حجم
                     </div>
 
-                    <div class="value">
+                    <div class="detail-value">
                         ${
-                            alert.rsi !== null &&
-                            alert.rsi !== undefined
-                                ? Number(alert.rsi).toFixed(2)
+                            Number.isFinite(
+                                Number(
+                                    whale.volumeRatio
+                                )
+                            )
+                                ? Number(
+                                    whale.volumeRatio
+                                ).toFixed(2)
+                                + "x"
                                 : "-"
                         }
                     </div>
@@ -597,124 +1490,353 @@ function renderAlert(
                 </div>
 
 
-                <div class="item">
+                <div class="detail">
 
-                    <div class="label">
+                    <div class="detail-label">
+                        تغییر قیمت
+                    </div>
+
+                    <div class="detail-value">
+                        ${
+                            formatPercent(
+                                whale.priceChange
+                            )
+                        }
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
                         امتیاز
                     </div>
 
-                    <div class="value">
-                        ${alert.score ?? "-"}
+                    <div class="detail-value">
+                        ${
+                            whale.score ??
+                            "-"
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* ==================================================
+   TRADE PLAN
+================================================== */
+
+function renderTradePlan(
+    plan
+) {
+
+    if (
+        !plan
+    ) {
+
+        return "";
+    }
+
+
+    return `
+
+        <div class="whale">
+
+            <div class="whale-title">
+                📊 برنامه تحلیلی
+            </div>
+
+            <div class="details">
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        ورود
+                    </div>
+
+                    <div class="detail-value">
+                        ${
+                            formatNumber(
+                                plan.entry,
+                                8
+                            )
+                        }
                     </div>
 
                 </div>
 
 
-                <div class="item">
+                <div class="detail">
 
-                    <div class="label">
+                    <div class="detail-label">
+                        حد ضرر
+                    </div>
+
+                    <div class="detail-value">
+                        ${
+                            formatNumber(
+                                plan.stopLoss,
+                                8
+                            )
+                        }
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        هدف اول
+                    </div>
+
+                    <div class="detail-value">
+                        ${
+                            formatNumber(
+                                plan.takeProfit1,
+                                8
+                            )
+                        }
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        هدف دوم
+                    </div>
+
+                    <div class="detail-value">
+                        ${
+                            formatNumber(
+                                plan.takeProfit2,
+                                8
+                            )
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* ==================================================
+   RENDER ALERT
+================================================== */
+
+function renderAlert(
+    alert
+) {
+
+    const reasons =
+        Array.isArray(
+            alert.reasons
+        )
+            ? alert.reasons
+            : [];
+
+
+    const reasonsHTML =
+        reasons.length > 0
+
+            ? `
+                <div class="reasons">
+
+                    <strong>
+                        دلایل تحلیل:
+                    </strong>
+
+                    <ul>
+
+                        ${
+                            reasons
+                                .map(
+                                    reason =>
+                                        `<li>
+                                            ${escapeHTML(
+                                                reason
+                                            )}
+                                        </li>`
+                                )
+                                .join("")
+                        }
+
+                    </ul>
+
+                </div>
+            `
+
+            : "";
+
+
+    return `
+
+        <div class="alert">
+
+            <div class="alert-head">
+
+                <div>
+
+                    <span class="symbol">
+
+                        ${escapeHTML(
+                            alert.symbol
+                        )}
+
+                    </span>
+
+                    ${signalBadge(
+                        alert.signal
+                    )}
+
+                    ${priorityBadge(
+                        alert.priority
+                    )}
+
+                </div>
+
+
+                <div class="subtitle">
+
+                    🕐
+                    ${escapeHTML(
+                        alert.timeLocal ||
+                        alert.time ||
+                        "-"
+                    )}
+
+                </div>
+
+            </div>
+
+
+            <div class="details">
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        قیمت
+                    </div>
+
+                    <div class="detail-value">
+                        $
+                        ${escapeHTML(
+                            alert.priceFormatted ||
+                            formatNumber(
+                                alert.price,
+                                8
+                            )
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        قدرت
+                    </div>
+
+                    <div class="detail-value">
+                        ${escapeHTML(
+                            alert.strength
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        اعتماد ترکیبی
+                    </div>
+
+                    <div class="detail-value">
+                        ${escapeHTML(
+                            alert.combinedConfidence
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        RSI
+                    </div>
+
+                    <div class="detail-value">
+                        ${formatNumber(
+                            alert.rsi,
+                            2
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
+                        امتیاز
+                    </div>
+
+                    <div class="detail-value">
+                        ${escapeHTML(
+                            alert.score ??
+                            "-"
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <div class="detail-label">
                         روند
                     </div>
 
-                    <div class="value">
-                        ${alert.trend || "-"}
+                    <div class="detail-value">
+                        ${escapeHTML(
+                            alert.trend
+                        )}
                     </div>
 
                 </div>
 
-            </div>
-
-
-            <div class="whale">
-
-                🐋
-                <strong>
-                    فعالیت بازار
-                </strong>
-
-                <div class="grid">
-
-                    <div class="item">
-
-                        <div class="label">
-                            جهت
-                        </div>
-
-                        <div class="value">
-                            ${whale.signal || "-"}
-                        </div>
-
-                    </div>
-
-
-                    <div class="item">
-
-                        <div class="label">
-                            شدت
-                        </div>
-
-                        <div class="value">
-                            ${whale.level || "-"}
-                        </div>
-
-                    </div>
-
-
-                    <div class="item">
-
-                        <div class="label">
-                            نسبت حجم
-                        </div>
-
-                        <div class="value">
-                            ${whale.volumeRatio ?? "-"}x
-                        </div>
-
-                    </div>
-
-
-                    <div class="item">
-
-                        <div class="label">
-                            تغییر قیمت
-                        </div>
-
-                        <div class="value">
-                            ${whale.priceChange ?? "-"}%
-                        </div>
-
-                    </div>
-
-                </div>
 
             </div>
 
 
-            <div
-                style="
-                    margin-top:15px;
-                    color:#8f9bb3;
-                    font-size:13px;
-                "
-            >
-
-                🕒 ${alert.timeLocal || "-"}
-
-            </div>
+            ${renderWhale(
+                alert.whale
+            )}
 
 
-            <div
-                style="
-                    margin-top:12px;
-                    color:#ffcf66;
-                    font-size:12px;
-                "
-            >
+            ${renderTradePlan(
+                alert.tradePlan
+            )}
 
-                ⚠️ این هشدار تحلیل احتمالی بازار است،
-                نه تضمین حرکت قیمت.
 
-            </div>
+            ${reasonsHTML}
 
         </div>
 
@@ -722,151 +1844,284 @@ function renderAlert(
 }
 
 
-/* =========================
-   دریافت اطلاعات
-========================= */
+/* ==================================================
+   LOAD ALERTS
+================================================== */
 
-async function loadData() {
+async function loadAlerts() {
+
+    const data =
+        await fetchJSON(
+            "/alerts"
+        );
+
+
+    const alerts =
+        Array.isArray(
+            data.alerts
+        )
+            ? data.alerts
+            : [];
+
+
+    alertsValue.textContent =
+        alerts.length;
+
+
+    alertCountText.textContent =
+        alerts.length +
+        " هشدار";
+
+
+    if (
+        alerts.length === 0
+    ) {
+
+        alertsContainer.innerHTML = `
+
+            <div class="empty">
+
+                💤
+                هنوز هشدار مهمی ثبت نشده.
+
+                <br><br>
+
+                سیستم همچنان در حال
+                پایش بازار است.
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    alertsContainer.innerHTML =
+        alerts
+            .map(
+                renderAlert
+            )
+            .join("");
+}
+
+
+/* ==================================================
+   LOAD LATEST
+================================================== */
+
+async function loadLatest() {
 
     try {
 
-        const health =
-            await api(
-                "/"
-            );
-
-
-        document
-            .getElementById(
-                "status"
-            )
-            .innerHTML =
-
-                `
-                🟢 سرور آنلاین است
-                `;
-
-
-        document
-            .getElementById(
-                "serverStatus"
-            )
-            .innerText =
-                "ONLINE";
-
-
-        document
-            .getElementById(
-                "coinCount"
-            )
-            .innerText =
-                health.monitoredCoins;
-
-
-        document
-            .getElementById(
-                "interval"
-            )
-            .innerText =
-                health.intervalSeconds +
-                " ثانیه";
+        hideError();
 
 
         const data =
-            await api(
-                "/alerts"
+            await fetchJSON(
+                "/alerts/latest"
             );
 
 
-        document
-            .getElementById(
-                "alertCount"
-            )
-            .innerText =
-                data.count;
-
-
-        const container =
-            document
-                .getElementById(
-                    "alerts"
-                );
-
-
         if (
-            !data.alerts ||
-            data.alerts.length === 0
+            !data.alert
         ) {
 
-            container.innerHTML = `
-
-                <div class="empty">
-
-                    هنوز هشدار مناسبی
-                    ثبت نشده است.
-
-                </div>
-
-            `;
+            showSuccess(
+                "هنوز هشدار جدیدی ثبت نشده."
+            );
 
             return;
         }
 
 
-        container.innerHTML =
-            data.alerts
-                .map(
-                    renderAlert
-                )
-                .join("");
+        alertsContainer.innerHTML =
+            renderAlert(
+                data.alert
+            );
+
+
+        alertCountText.textContent =
+            "آخرین هشدار";
+
+
+        showSuccess(
+            "آخرین هشدار نمایش داده شد."
+        );
 
 
     } catch (error) {
 
-        console.error(
-            error
+        showError(
+            "دریافت آخرین هشدار ناموفق بود: " +
+            error.message
         );
 
-
-        document
-            .getElementById(
-                "status"
-            )
-            .innerHTML =
-
-                `
-                🔴 اتصال به سرور برقرار نشد
-                `;
-
-        document
-            .getElementById(
-                "serverStatus"
-            )
-            .innerText =
-                "OFFLINE";
-
     }
-
 }
 
 
-/* =========================
-   شروع
-========================= */
+/* ==================================================
+   MANUAL CHECK
+================================================== */
 
-loadData();
+async function manualCheck() {
+
+    try {
+
+        hideError();
 
 
-/* =========================
-   بروزرسانی خودکار
-========================= */
+        checkButton.disabled =
+            true;
+
+        checkButton.textContent =
+            "⏳ در حال بررسی...";
+
+
+        const data =
+            await fetchJSON(
+                "/check",
+                {
+                    method:
+                        "POST"
+                }
+            );
+
+
+        if (
+            data.success !== true
+        ) {
+
+            throw new Error(
+                data.error ||
+                "بررسی انجام نشد."
+            );
+        }
+
+
+        showSuccess(
+            "بررسی بازار انجام شد."
+        );
+
+
+        await loadDashboard();
+
+
+    } catch (error) {
+
+        showError(
+            "بررسی بازار ناموفق بود: " +
+            error.message
+        );
+
+    } finally {
+
+        checkButton.disabled =
+            false;
+
+        checkButton.textContent =
+            "🔎 بررسی بازار الان";
+    }
+}
+
+
+/* ==================================================
+   LOAD DASHBOARD
+================================================== */
+
+async function loadDashboard() {
+
+    try {
+
+        hideError();
+
+
+        refreshButton.disabled =
+            true;
+
+        refreshButton.textContent =
+            "⏳ بروزرسانی...";
+
+
+        await loadStatus();
+
+        await loadAlerts();
+
+
+    } catch (error) {
+
+        serverStatus.textContent =
+            "🔴 اتصال برقرار نشد";
+
+        serverStatus.className =
+            "status offline";
+
+
+        statusValue.textContent =
+            "آفلاین";
+
+
+        showError(
+
+            "اتصال به سرور برقرار نشد. " +
+
+            "آدرس API: " +
+
+            API_BASE +
+
+            " | " +
+
+            error.message
+
+        );
+
+    } finally {
+
+        refreshButton.disabled =
+            false;
+
+        refreshButton.textContent =
+            "🔄 بروزرسانی";
+    }
+}
+
+
+/* ==================================================
+   AUTO REFRESH
+================================================== */
 
 setInterval(
-    loadData,
+
+    () => {
+
+        loadDashboard();
+
+    },
+
     30 * 1000
+
+);
+
+
+/* ==================================================
+   START
+================================================== */
+
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    () => {
+
+        loadDashboard();
+
+    }
+
 );
 
 </script>
+
 
 </body>
 
