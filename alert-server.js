@@ -1,5 +1,6 @@
 const express = require("express");
 const axios = require("axios");
+const path = require("path");
 
 const {
     analyze
@@ -23,10 +24,10 @@ const PORT =
 ================================================== */
 
 const CHECK_INTERVAL =
-    60 * 1000; // بررسی هر 60 ثانیه
+    60 * 1000;
 
 const ALERT_COOLDOWN =
-    15 * 60 * 1000; // جلوگیری از هشدار تکراری
+    15 * 60 * 1000;
 
 
 /* ==================================================
@@ -70,6 +71,12 @@ const COINS = {
 
 const lastAlerts =
     new Map();
+
+const recentAlerts =
+    [];
+
+const MAX_ALERTS =
+    100;
 
 
 /* ==================================================
@@ -124,14 +131,10 @@ function canSendAlert(key) {
         return true;
     }
 
-    const elapsed =
-        Date.now() -
-        previous;
-
     return (
-        elapsed >=
-        ALERT_COOLDOWN
-    );
+        Date.now() -
+        previous
+    ) >= ALERT_COOLDOWN;
 }
 
 
@@ -145,7 +148,7 @@ function markAlert(key) {
 
 
 /* ==================================================
-   GET COINGECKO DATA
+   COINGECKO DATA
 ================================================== */
 
 async function getCoinData(
@@ -229,7 +232,8 @@ async function getCoinData(
                 : current;
 
 
-        let volume = 0;
+        let volume =
+            0;
 
 
         if (
@@ -317,8 +321,8 @@ function getAlertType(
 
 
     /*
-       سیگنال قوی + فعالیت
-       هم‌جهت
+       سیگنال قوی BUY
+       + فعالیت صعودی
     */
 
     if (
@@ -330,6 +334,11 @@ function getAlertType(
         return "STRONG_BUY_ACTIVITY";
     }
 
+
+    /*
+       سیگنال قوی SELL
+       + فعالیت نزولی
+    */
 
     if (
         strength === "Strong" &&
@@ -358,7 +367,7 @@ function getAlertType(
 
 
     /*
-       ترکیب سیگنال‌ها
+       اعتماد ترکیبی بالا
     */
 
     if (
@@ -389,7 +398,7 @@ function getAlertType(
 
 
 /* ==================================================
-   ALERT PRIORITY
+   PRIORITY
 ================================================== */
 
 function getPriority(
@@ -427,7 +436,7 @@ function getPriority(
 
 
 /* ==================================================
-   CREATE ALERT OBJECT
+   CREATE ALERT
 ================================================== */
 
 function createAlert(
@@ -552,15 +561,8 @@ function createAlert(
 
 
 /* ==================================================
-   ALERT STORAGE
+   SAVE ALERT
 ================================================== */
-
-const recentAlerts = [];
-
-
-const MAX_ALERTS =
-    100;
-
 
 function saveAlert(
     alert
@@ -652,10 +654,6 @@ async function checkCoin(
         );
 
 
-        /*
-           اگر هشدار مناسب نیست
-        */
-
         if (!alertType) {
 
             return null;
@@ -666,10 +664,6 @@ async function checkCoin(
             `${symbol}_${alertType}`;
 
 
-        /*
-           جلوگیری از هشدار تکراری
-        */
-
         if (
             !canSendAlert(
                 alertKey
@@ -677,10 +671,7 @@ async function checkCoin(
         ) {
 
             console.log(
-
-                `⏳ هشدار تکراری ` +
-                `${symbol} نادیده گرفته شد.`
-
+                `⏳ هشدار تکراری ${symbol}`
             );
 
             return null;
@@ -815,11 +806,30 @@ async function checkAllCoins() {
 
 
 /* ==================================================
-   HOME
+   DASHBOARD
 ================================================== */
 
 app.get(
     "/",
+    (req, res) => {
+
+        res.sendFile(
+            path.join(
+                __dirname,
+                "dashboard.html"
+            )
+        );
+
+    }
+);
+
+
+/* ==================================================
+   API STATUS
+================================================== */
+
+app.get(
+    "/api/status",
     (req, res) => {
 
         res.json({
@@ -847,8 +857,8 @@ app.get(
             recentAlerts:
                 recentAlerts.length,
 
-            message:
-                "Market monitoring server is running."
+            lastCheck:
+                new Date().toISOString()
 
         });
 
@@ -882,7 +892,7 @@ app.get(
 
 
 /* ==================================================
-   RECENT ALERTS
+   ALL ALERTS
 ================================================== */
 
 app.get(
@@ -948,7 +958,36 @@ app.get(
 
 
 /* ==================================================
-   MANUAL MARKET CHECK
+   COINS
+================================================== */
+
+app.get(
+    "/coins",
+    (req, res) => {
+
+        res.json({
+
+            success:
+                true,
+
+            count:
+                Object.keys(
+                    COINS
+                ).length,
+
+            coins:
+                Object.keys(
+                    COINS
+                )
+
+        });
+
+    }
+);
+
+
+/* ==================================================
+   MANUAL CHECK
 ================================================== */
 
 app.post(
@@ -986,36 +1025,8 @@ app.post(
                         error.message
 
                 });
+
         }
-
-    }
-);
-
-
-/* ==================================================
-   COINS
-================================================== */
-
-app.get(
-    "/coins",
-    (req, res) => {
-
-        res.json({
-
-            success:
-                true,
-
-            count:
-                Object.keys(
-                    COINS
-                ).length,
-
-            coins:
-                Object.keys(
-                    COINS
-                )
-
-        });
 
     }
 );
@@ -1080,7 +1091,7 @@ app.listen(
 
 
         /*
-           بررسی مداوم
+           بررسی خودکار
         */
 
         setInterval(
