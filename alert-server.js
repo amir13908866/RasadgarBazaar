@@ -1,6 +1,5 @@
 const express = require("express");
 const axios = require("axios");
-const twilio = require("twilio");
 
 const {
     analyze
@@ -24,10 +23,10 @@ const PORT =
 ================================================== */
 
 const CHECK_INTERVAL =
-    60 * 1000; // هر 60 ثانیه
+    60 * 1000; // بررسی هر 60 ثانیه
 
-const SMS_COOLDOWN =
-    15 * 60 * 1000; // 15 دقیقه
+const ALERT_COOLDOWN =
+    15 * 60 * 1000; // جلوگیری از هشدار تکراری
 
 
 /* ==================================================
@@ -74,86 +73,6 @@ const lastAlerts =
 
 
 /* ==================================================
-   TWILIO CONFIG
-================================================== */
-
-function smsConfigured() {
-
-    return Boolean(
-
-        process.env.TWILIO_ACCOUNT_SID &&
-        process.env.TWILIO_AUTH_TOKEN &&
-        process.env.TWILIO_NUMBER &&
-        process.env.ALERT_TO_NUMBER
-
-    );
-}
-
-
-/* ==================================================
-   SEND SMS
-================================================== */
-
-async function sendSMS(message) {
-
-    if (!smsConfigured()) {
-
-        console.log(
-            "⚠️ Twilio تنظیم نشده است."
-        );
-
-        return false;
-    }
-
-
-    try {
-
-        const client =
-            twilio(
-
-                process.env.TWILIO_ACCOUNT_SID,
-
-                process.env.TWILIO_AUTH_TOKEN
-
-            );
-
-
-        const result =
-            await client.messages.create({
-
-                body:
-                    message,
-
-                from:
-                    process.env.TWILIO_NUMBER,
-
-                to:
-                    process.env.ALERT_TO_NUMBER
-
-            });
-
-
-        console.log(
-            "📱 SMS ارسال شد:",
-            result.sid
-        );
-
-
-        return true;
-
-    } catch (error) {
-
-        console.error(
-            "❌ خطای ارسال SMS:",
-            error.message
-        );
-
-        return false;
-    }
-}
-
-
-/* ==================================================
    FORMAT PRICE
 ================================================== */
 
@@ -162,7 +81,6 @@ function formatPrice(value) {
     const number =
         Number(value);
 
-
     if (
         !Number.isFinite(number)
     ) {
@@ -170,13 +88,25 @@ function formatPrice(value) {
         return "-";
     }
 
-
     return number.toLocaleString(
         "en-US",
         {
             maximumFractionDigits: 8
         }
     );
+}
+
+
+/* ==================================================
+   FORMAT TIME
+================================================== */
+
+function formatTime() {
+
+    return new Date()
+        .toLocaleString(
+            "fa-IR"
+        );
 }
 
 
@@ -189,17 +119,19 @@ function canSendAlert(key) {
     const previous =
         lastAlerts.get(key);
 
-
     if (!previous) {
 
         return true;
     }
 
+    const elapsed =
+        Date.now() -
+        previous;
 
     return (
-        Date.now() -
-        previous
-    ) >= SMS_COOLDOWN;
+        elapsed >=
+        ALERT_COOLDOWN
+    );
 }
 
 
@@ -361,7 +293,7 @@ async function getCoinData(
 
 
 /* ==================================================
-   CHECK GOOD SIGNAL
+   DETERMINE ALERT TYPE
 ================================================== */
 
 function getAlertType(
@@ -377,17 +309,39 @@ function getAlertType(
     const signal =
         analysis.signal;
 
-
     const strength =
         analysis.strength;
-
 
     const whale =
         analysis.whale;
 
 
     /*
-       1
+       سیگنال قوی + فعالیت
+       هم‌جهت
+    */
+
+    if (
+        strength === "Strong" &&
+        signal === "BUY" &&
+        whale?.signal === "BULLISH"
+    ) {
+
+        return "STRONG_BUY_ACTIVITY";
+    }
+
+
+    if (
+        strength === "Strong" &&
+        signal === "SELL" &&
+        whale?.signal === "BEARISH"
+    ) {
+
+        return "STRONG_SELL_ACTIVITY";
+    }
+
+
+    /*
        سیگنال تکنیکال قوی
     */
 
@@ -399,36 +353,12 @@ function getAlertType(
         )
     ) {
 
-        /*
-           اگر فعالیت بازار
-           هم جهت باشد
-        */
-
-        if (
-            signal === "BUY" &&
-            whale?.signal === "BULLISH"
-        ) {
-
-            return "STRONG_BUY_ACTIVITY";
-        }
-
-
-        if (
-            signal === "SELL" &&
-            whale?.signal === "BEARISH"
-        ) {
-
-            return "STRONG_SELL_ACTIVITY";
-        }
-
-
         return "STRONG_SIGNAL";
     }
 
 
     /*
-       2
-       ترکیب سیگنال + فعالیت بازار
+       ترکیب سیگنال‌ها
     */
 
     if (
@@ -441,7 +371,6 @@ function getAlertType(
 
 
     /*
-       3
        فعالیت بسیار شدید
     */
 
@@ -460,10 +389,48 @@ function getAlertType(
 
 
 /* ==================================================
-   CREATE SMS
+   ALERT PRIORITY
 ================================================== */
 
-function createAlertMessage(
+function getPriority(
+    alertType
+) {
+
+    switch (
+        alertType
+    ) {
+
+        case "STRONG_BUY_ACTIVITY":
+
+        case "STRONG_SELL_ACTIVITY":
+
+        case "COMBINED_HIGH":
+
+            return "HIGH";
+
+
+        case "EXTREME_ACTIVITY":
+
+            return "VERY_HIGH";
+
+
+        case "STRONG_SIGNAL":
+
+            return "MEDIUM";
+
+
+        default:
+
+            return "LOW";
+    }
+}
+
+
+/* ==================================================
+   CREATE ALERT OBJECT
+================================================== */
+
+function createAlert(
     symbol,
     analysis,
     alertType
@@ -474,7 +441,7 @@ function createAlertMessage(
 
 
     let whaleDirection =
-        "عادی";
+        "NEUTRAL";
 
 
     if (
@@ -483,7 +450,7 @@ function createAlertMessage(
     ) {
 
         whaleDirection =
-            "صعودی";
+            "BULLISH";
 
     } else if (
         whale?.signal ===
@@ -491,112 +458,126 @@ function createAlertMessage(
     ) {
 
         whaleDirection =
-            "نزولی";
+            "BEARISH";
     }
 
 
-    const now =
-        new Date();
+    return {
 
+        id:
+            `${symbol}_${Date.now()}`,
 
-    let priority =
-        "متوسط";
+        time:
+            new Date().toISOString(),
 
+        timeLocal:
+            formatTime(),
 
-    if (
-        alertType ===
-        "STRONG_BUY_ACTIVITY" ||
+        symbol:
+            symbol,
 
-        alertType ===
-        "STRONG_SELL_ACTIVITY" ||
+        alertType:
+            alertType,
 
-        alertType ===
-        "COMBINED_HIGH"
-    ) {
+        priority:
+            getPriority(
+                alertType
+            ),
 
-        priority =
-            "بالا";
-    }
+        signal:
+            analysis.signal || "-",
 
+        strength:
+            analysis.strength || "-",
 
-    if (
-        alertType ===
-        "EXTREME_ACTIVITY"
-    ) {
+        combinedConfidence:
+            analysis.combinedConfidence || "-",
 
-        priority =
-            "خیلی بالا";
-    }
+        price:
+            Number(
+                analysis.price
+            ) || null,
 
-
-    return [
-
-        "🚨 رصدگر بازار",
-
-        `ارز: ${symbol}`,
-
-        `اولویت: ${priority}`,
-
-        `سیگنال: ${
-            analysis.signal || "-"
-        }`,
-
-        `قدرت: ${
-            analysis.strength || "-"
-        }`,
-
-        `اعتماد ترکیبی: ${
-            analysis.combinedConfidence || "-"
-        }`,
-
-        `قیمت: ${
+        priceFormatted:
             formatPrice(
                 analysis.price
+            ),
+
+        score:
+            analysis.score ?? null,
+
+        rsi:
+            analysis.rsi ?? null,
+
+        trend:
+            analysis.trend || "-",
+
+        whale: {
+
+            available:
+                whale?.available || false,
+
+            signal:
+                whaleDirection,
+
+            level:
+                whale?.level || "-",
+
+            score:
+                whale?.score ?? null,
+
+            volumeRatio:
+                whale?.volumeRatio ?? null,
+
+            priceChange:
+                whale?.priceChange ?? null,
+
+            signalTime:
+                whale?.signalTime || null
+
+        },
+
+        tradePlan:
+            analysis.tradePlan || null,
+
+        reasons:
+            Array.isArray(
+                analysis.reasons
             )
-        }`,
+                ? analysis.reasons
+                : []
 
-        `RSI: ${
-            analysis.rsi !== null &&
-            analysis.rsi !== undefined
+    };
+}
 
-                ? Number(
-                    analysis.rsi
-                ).toFixed(2)
 
-                : "-"
-        }`,
+/* ==================================================
+   ALERT STORAGE
+================================================== */
 
-        `امتیاز: ${
-            analysis.score ?? "-"
-        }`,
+const recentAlerts = [];
 
-        `🐋 فعالیت بازار: ${
-            whaleDirection
-        }`,
 
-        `شدت فعالیت: ${
-            whale?.level || "-"
-        }`,
+const MAX_ALERTS =
+    100;
 
-        `نسبت حجم: ${
-            whale?.volumeRatio ?? "-"
-        }x`,
 
-        `تغییر قیمت: ${
-            whale?.priceChange ?? "-"
-        }%`,
+function saveAlert(
+    alert
+) {
 
-        `زمان: ${
-            now.toLocaleString(
-                "fa-IR"
-            )
-        }`,
+    recentAlerts.unshift(
+        alert
+    );
 
-        "",
 
-        "⚠️ هشدار تحلیلی است و تضمین حرکت قیمت نیست."
+    if (
+        recentAlerts.length >
+        MAX_ALERTS
+    ) {
 
-    ].join("\n");
+        recentAlerts.pop();
+    }
 }
 
 
@@ -672,22 +653,22 @@ async function checkCoin(
 
 
         /*
-           هشدار مناسب نیست
+           اگر هشدار مناسب نیست
         */
 
         if (!alertType) {
 
-            return;
+            return null;
         }
 
-
-        /*
-           جلوگیری از پیامک تکراری
-        */
 
         const alertKey =
             `${symbol}_${alertType}`;
 
+
+        /*
+           جلوگیری از هشدار تکراری
+        */
 
         if (
             !canSendAlert(
@@ -696,15 +677,18 @@ async function checkCoin(
         ) {
 
             console.log(
-                `⏳ هشدار تکراری ${symbol}`
+
+                `⏳ هشدار تکراری ` +
+                `${symbol} نادیده گرفته شد.`
+
             );
 
-            return;
+            return null;
         }
 
 
-        const message =
-            createAlertMessage(
+        const alert =
+            createAlert(
 
                 symbol,
 
@@ -715,27 +699,31 @@ async function checkCoin(
             );
 
 
-        console.log(
-            "\n🚨 هشدار پیدا شد:"
-        );
-
-        console.log(
-            message
+        saveAlert(
+            alert
         );
 
 
-        const sent =
-            await sendSMS(
-                message
-            );
+        markAlert(
+            alertKey
+        );
 
 
-        if (sent) {
+        console.log(
+            "\n🚨 هشدار جدید!"
+        );
 
-            markAlert(
-                alertKey
-            );
-        }
+
+        console.log(
+            JSON.stringify(
+                alert,
+                null,
+                2
+            )
+        );
+
+
+        return alert;
 
     } catch (error) {
 
@@ -746,6 +734,9 @@ async function checkCoin(
             error.message
 
         );
+
+
+        return null;
     }
 }
 
@@ -754,7 +745,25 @@ async function checkCoin(
    CHECK ALL COINS
 ================================================== */
 
+let isChecking =
+    false;
+
+
 async function checkAllCoins() {
+
+    if (isChecking) {
+
+        console.log(
+            "⏳ بررسی قبلی هنوز تمام نشده."
+        );
+
+        return;
+    }
+
+
+    isChecking =
+        true;
+
 
     console.log(
         "\n================================"
@@ -765,9 +774,7 @@ async function checkAllCoins() {
     );
 
     console.log(
-        new Date().toLocaleString(
-            "fa-IR"
-        )
+        formatTime()
     );
 
     console.log(
@@ -775,21 +782,29 @@ async function checkAllCoins() {
     );
 
 
-    for (
-        const [
-            symbol,
-            coinId
-        ]
-        of Object.entries(
-            COINS
-        )
-    ) {
+    try {
 
-        await checkCoin(
-            symbol,
-            coinId
-        );
+        for (
+            const [
+                symbol,
+                coinId
+            ]
+            of Object.entries(
+                COINS
+            )
+        ) {
 
+            await checkCoin(
+                symbol,
+                coinId
+            );
+
+        }
+
+    } finally {
+
+        isChecking =
+            false;
     }
 
 
@@ -800,7 +815,7 @@ async function checkAllCoins() {
 
 
 /* ==================================================
-   HEALTH CHECK
+   HOME
 ================================================== */
 
 app.get(
@@ -818,8 +833,8 @@ app.get(
             status:
                 "online",
 
-            smsConfigured:
-                smsConfigured(),
+            sms:
+                false,
 
             monitoredCoins:
                 Object.keys(
@@ -828,6 +843,9 @@ app.get(
 
             intervalSeconds:
                 CHECK_INTERVAL / 1000,
+
+            recentAlerts:
+                recentAlerts.length,
 
             message:
                 "Market monitoring server is running."
@@ -839,7 +857,7 @@ app.get(
 
 
 /* ==================================================
-   HEALTH ENDPOINT
+   HEALTH
 ================================================== */
 
 app.get(
@@ -851,6 +869,9 @@ app.get(
             status:
                 "ok",
 
+            online:
+                true,
+
             time:
                 new Date().toISOString()
 
@@ -861,39 +882,82 @@ app.get(
 
 
 /* ==================================================
-   MANUAL TEST SMS
+   RECENT ALERTS
+================================================== */
+
+app.get(
+    "/alerts",
+    (req, res) => {
+
+        res.json({
+
+            success:
+                true,
+
+            count:
+                recentAlerts.length,
+
+            alerts:
+                recentAlerts
+
+        });
+
+    }
+);
+
+
+/* ==================================================
+   LATEST ALERT
+================================================== */
+
+app.get(
+    "/alerts/latest",
+    (req, res) => {
+
+        if (
+            recentAlerts.length === 0
+        ) {
+
+            return res.json({
+
+                success:
+                    true,
+
+                alert:
+                    null,
+
+                message:
+                    "هنوز هشداری ثبت نشده."
+
+            });
+        }
+
+
+        res.json({
+
+            success:
+                true,
+
+            alert:
+                recentAlerts[0]
+
+        });
+
+    }
+);
+
+
+/* ==================================================
+   MANUAL MARKET CHECK
 ================================================== */
 
 app.post(
-    "/test-sms",
+    "/check",
     async (req, res) => {
 
         try {
 
-            const sent =
-                await sendSMS(
-
-                    "📱 تست رصدگر بازار\n\n" +
-
-                    "سرور پیامک با موفقیت کار می‌کند."
-
-                );
-
-
-            if (!sent) {
-
-                return res
-                    .status(500)
-                    .json({
-
-                        success:
-                            false,
-
-                        message:
-                            "SMS ارسال نشد."
-
-                    });
-            }
+            await checkAllCoins();
 
 
             res.json({
@@ -902,7 +966,10 @@ app.post(
                     true,
 
                 message:
-                    "SMS ارسال شد."
+                    "بررسی بازار انجام شد.",
+
+                alerts:
+                    recentAlerts.length
 
             });
 
@@ -919,8 +986,36 @@ app.post(
                         error.message
 
                 });
-
         }
+
+    }
+);
+
+
+/* ==================================================
+   COINS
+================================================== */
+
+app.get(
+    "/coins",
+    (req, res) => {
+
+        res.json({
+
+            success:
+                true,
+
+            count:
+                Object.keys(
+                    COINS
+                ).length,
+
+            coins:
+                Object.keys(
+                    COINS
+                )
+
+        });
 
     }
 );
@@ -969,11 +1064,7 @@ app.listen(
         );
 
         console.log(
-            `📱 SMS: ${
-                smsConfigured()
-                    ? "ON"
-                    : "OFF"
-            }`
+            "📱 SMS: OFF"
         );
 
         console.log(
